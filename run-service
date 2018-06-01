@@ -1,4 +1,36 @@
 #
+template
+========
+
+docker network create app
+docker volume crate app
+
+docker run -d \
+           -p port:port \
+           --restart always \
+           --name app \
+           --network app \
+           --mount type=volume,src=app,dst=/app \
+           app
+
+docker run -it --rm mongo mongo IPADDRESS
+
+docker network create -d overlay [--attachable] mongo-overlay
+
+# 1 instance
+docker service create -d \
+                      -p port:port \
+                      --name app \
+                      --network app-overlay \
+                      --mount type=volume,src=app,dst=/app \
+                      app
+
+                      --replicas
+                      --mode replicated or global
+                      --constraint 
+
+docker run -it --rm app app IPADDRESS
+docker run -it --rm --network app-overlay app app --host app
 
 mongo
 =====
@@ -38,3 +70,34 @@ docker service create -d \
 docker run -it --rm mongo mongo IPADDRESS
 docker run -it --rm --network mongo-overlay mongo mongo --host mongo
 
+mongo-express
+-------------
+docker run -d -p 8081:8081 --name mongo-express --network mongo-overlay mongo-express
+
+influxdb
+========
+
+docker network create influxdb
+docker volume create influxdb
+
+docker run -d \
+           -p 8086:8086 \
+           --restart always \
+           --name influxdb \
+           --network influxdb \
+           --mount type=volume,src=influxdb,dst=/var/lib/influxdb \
+           influxdb
+
+           -p 2003:2003
+
+docker network create -d overlay influxdb-overlay
+docker network create -d overlay --attachable influxdb-overlay
+
+docker service create -d \
+                      -p 8086:8086 \
+                      --name influxdb \
+                      --network influxdb-overlay \
+                      --mount type=volume,src=influxdb,dst=/var/lib/influxdb \
+                      influxdb
+
+docker run -it --rm  influxdb influx -host influxdb
