@@ -1,0 +1,40 @@
+#
+
+mongo
+=====
+#
+docker network create mongo
+docker volume create mongo-db
+docker volume create mongo-configdb
+
+docker run -d \
+           -p 27017:27017 \
+           --restart always \
+           --name mongo \
+           --network mongo \
+           --mount type=volume,src=mongo-db,dst=/data/db \
+           --mount type=volume,src=mongo-configdb,dst=/data/configdb \
+           mongo
+
+docker run -it --rm mongo mongo IPADDRESS
+
+#
+docker network create -d overlay mongo-overlay
+docker network create -d overlay --attachable mongo-overlay
+
+1 instance
+docker service create -d \
+                      -p 27017:27017 \
+                      --name mongo \
+                      --network mongo-overlay \
+                      --mount type=volume,src=mongo-db,dst=/data/db \
+                      --mount type=volume,src=mongo-configdb,dst=/data/configdb \
+                      mongo
+
+                      --replicas
+                      --mode replicated or global
+                      --constraint 
+
+docker run -it --rm mongo mongo IPADDRESS
+docker run -it --rm --network mongo-overlay mongo mongo --host mongo
+
