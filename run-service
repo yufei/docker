@@ -25,6 +25,7 @@ docker service create -d \
                       --mount type=volume,src=app,dst=/app \
                       app
 
+                      --config
                       --replicas
                       --mode replicated or global
                       --constraint 
