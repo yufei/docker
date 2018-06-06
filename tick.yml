@@ -54,11 +54,66 @@ services:
       - source: local.conf
         target: /etc/telegraf/telegraf.d/local.conf
 
+  chronograf:
+    image: chronograf
+    ports:
+      - "8888:8888"
+    networks:
+      - tick
+    volumes:
+      - type: volume
+        source: chronograf
+        target: /var/lib/chronograf
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+        parallelism: 1
+        delay: 1s
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+
+  kapacitor:
+    image: kapacitor
+    ports:
+      - "9092:9092"
+    networks:
+      - tick
+    volumes:
+      - type: volume
+        source: kapacitor
+        target: /var/lib/kapacitor
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+        parallelism: 1
+        delay: 1s
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+#   environment:
+#     KAPACITOR_HOSTNAME: kapacitor
+#     KAPACITOR_LOGGING_LEVEL: INFO
+#     KAPACITOR_REPORTING_ENABLED: false
+#     KAPACITOR_INFLUXDB_0_URLS_0: http://influxdb:8086
+        
 networks:
   tick:
 
 volumes:
   influxdb:
+  chronograf:
+  kapacitor:
 
 configs:
   local.conf:
