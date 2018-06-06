@@ -1,0 +1,4 @@
+#!/bin/bash
+
+scp tick.yml SERVER:/root/ && \
+ssh SERVER docker stack deploy -c /root/tick.yml tick
