@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# swarm mode
+#docker network create -d overlay [--attachable] mongo-overlay
+docker network create -d overlay app-overlay
+docker volume create app
+#docker config create
+#docker secret create
+
+# 1 instance
+docker service create -d \
+                      -p port:port \
+		      -p published=port,target=port,mode=,protocol=tcp
+                      --name app \
+                      --network app-overlay \
+                      --mount type=volume,src=app,dst=/app[,ro,volume-label="k=v"] \
+                      --replicas 1
+                      --restart-condition any or none or on-failure
+		      -e K=V
+                      app
+
+                      --config
+		      --secret
+                      --mode replicated or global
+		      --endpoint-mode vip or dnsrr
+                      --constraint 'node or label == something'
+		      --placement-pref 'spread=something'
+		      --container-label list
+		      --hostname container-hostname
+		      -l k=v
+		      -w workdir
+		      --with-registry-auth (login first)
+
+docker exec -it app [command] [arg]
+docker service create -td app [command] [arg]

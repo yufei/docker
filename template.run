@@ -1,0 +1,20 @@
+#!/bin/bash
+
+docker network create app
+docker volume crate app
+
+docker run -d \
+           -p port:port \
+           --name app \
+           --network app \
+           --mount type=volume,src=app,dst=/app \
+           --restart on-failure or unless-stopped or always or no \
+           -e K=V
+           app
+
+           --init
+           -h hostname
+           -l label
+           -w working-directory
+
+docker run -itd --rm app [command] [arg]

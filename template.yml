@@ -1,0 +1,44 @@
+# app
+
+version: "3.5"
+
+services:
+
+  app:
+    image: app
+    ports:
+      - "port:port"
+    networks:
+      - prod
+    volumes:
+      - type: volume
+        source: app
+        target: /app
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+        parallelism: 1
+        delay: 1s
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+    environment:
+      KEY: 'true'
+    configs:
+      - source: local.conf
+        target: /app/local.conf
+
+networks:
+  prod:
+
+volumes:
+  app:
+
+configs:
+  local.conf:
+    file: ./local.conf
