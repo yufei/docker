@@ -1,0 +1,48 @@
+# tick
+
+version: "3.5"
+
+services:
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - production
+    volumes:
+      - type: volume
+        source: grafana
+        target: /var/lib/grafana
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 1s
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+#   environment:
+#     GF_SectionName_KeyName: 
+#     GF_SERVER_ROOT_URL: "http://servername"
+#     GF_DEFAULT_INSTANCE_NAME: 
+#     GF_SECURITY_ADMIN_USER:: 'admin'
+#     GF_SECURITY_ADMIN_PASSWORD: 'admin'
+#     GF_USERS_AUTO_ASSIGN_ORG: 'true' (to the id=1 org)
+#     GF_USERS_AUTO_ASSIGN_ORG_ROLE: 'Viewer'
+#     GF_AUTH_ANONYMOUSE_ENABLED: 'true'
+#     GF_AUTH_ANONYMOUSE_ORG_NAME: 'Xilinx'
+#     GF_AUTH_ANONYMOUSE_ORG_ROLE: 'Viewer'
+#     GF_INSTALL_PLUGINS: 'plug1,plug2'
+#     GF_AUTH_BASIC_ENABLED: 'true'
+#     GF_AUTH_LDAP_ENABLED: 'true'
+#     GF_AUTH_LDAP_CONFIG_FILE: '/etc/grafana/ldap.toml'
+#     GF_SMTP_ENABLED: 'true'
+       
+networks:
+  production:
+
+volumes:
+  grafana:
