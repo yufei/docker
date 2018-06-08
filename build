@@ -1,4 +1,3 @@
 #!/bin/bash
 
-scp tick.yml local.conf SERVER:/root/ && \
-ssh SERVER docker stack deploy -c /root/tick.yml tick
+docker stack deploy -c prod.yml prod
