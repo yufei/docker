@@ -1,0 +1,83 @@
+# Alyvix with nats/nats-streaming, telegraf, influxdb, chronograf
+
+version: "3.5"
+
+services:
+
+  nats:
+    image: nats
+    ports:
+      - "4222:4222"
+      #- "6222:6222"
+      #- "8222:8222"
+    networks:
+      - alyvix
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+
+  telegraf:
+    image: telegraf
+    networks:
+      - alyvix
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+    configs:
+      - source: alyvix.conf
+        target: /etc/telegraf/telegraf.d/alyvix.conf
+
+  influxdb:
+    image: influxdb
+    ports:
+      - "8086:8086"
+    networks:
+      - alyvix
+    volumes:
+      - type: volume
+        source: influxdb
+        target: /var/lib/influxdb
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+
+  chronograf:
+    image: chronograf
+    ports:
+      - "8888:8888"
+    networks:
+      - alyvix
+    volumes:
+      - type: volume
+        source: chronograf
+        target: /var/lib/chronograf
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+ 
+networks:
+  alyvix:
+
+volumes:
+  influxdb:
+  chronograf:
+
+configs:
+  alyvix.conf:
+    file: ./alyvix.conf
