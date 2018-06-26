@@ -6,10 +6,7 @@ services:
 
   nats:
     image: nats
-<<<<<<< HEAD
     #image: nats-streaming
-=======
->>>>>>> 0b13d16b3129ec1094e3bd8c25ff768705f36e15
     ports:
       - "4222:4222"
       #- "6222:6222"
@@ -36,16 +33,11 @@ services:
       restart_policy:
         condition: on-failure
     configs:
-<<<<<<< HEAD
       # it doesn't respect -config-directory parameter
       #- source: alyvix.conf
       #  target: /etc/telegraf/telegraf.d/alyvix.conf
       - source: telegraf.conf
         target: /etc/telegraf/telegraf.conf
-=======
-      - source: alyvix.conf
-        target: /etc/telegraf/telegraf.d/alyvix.conf
->>>>>>> 0b13d16b3129ec1094e3bd8c25ff768705f36e15
 
   influxdb:
     image: influxdb
@@ -91,12 +83,7 @@ volumes:
   chronograf:
 
 configs:
-<<<<<<< HEAD
   #alyvix.conf:
   #  file: ./alyvix.conf
   telegraf.conf:
     file: ./telegraf.conf
-=======
-  alyvix.conf:
-    file: ./alyvix.conf
->>>>>>> 0b13d16b3129ec1094e3bd8c25ff768705f36e15
