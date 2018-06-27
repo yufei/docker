@@ -1,8 +1,53 @@
-# prod
+# production:
+#   database: 
+#     - influxdb
+#   frontend:
+#     - chronograf
+#     - grafana
+#   backend:
+#     - nats/nats-streaming
+#     - telegraf
+#   application:
+#     - alyvix
 
 version: "3.5"
 
 services:
+
+  nats:
+    image: nats
+    #image: nats-streaming
+    ports:
+      - "4222:4222"
+      #- "6222:6222"
+      #- "8222:8222"
+    networks:
+      - prod
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+
+  telegraf:
+    image: telegraf
+    networks:
+      - prod
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+    configs:
+      # it doesn't respect -config-directory parameter
+      #- source: alyvix.conf
+      #  target: /etc/telegraf/telegraf.d/alyvix.conf
+      - source: telegraf.conf
+        target: /etc/telegraf/telegraf.conf
 
   influxdb:
     image: influxdb
@@ -19,22 +64,8 @@ services:
       placement:
         constraints:
           - node.role == manager
-      update_config:
-        parallelism: 1
-        delay: 1s
       restart_policy:
         condition: on-failure
-        delay: 10s
-        max_attempts: 3
-        window: 120s
-    environment:
-#      INFLUXDB_BIND_ADDRESS=
-#      INFLUXDB_HTTP_BIND_ADDRESS=
-      INFLUXDB_HTTP_AUTH_ENABLED: 'true'
-#      INFLUXDB_HTTP_HTTPS_ENABLED=true
-#      INFLUXDB_HTTP_HTTPS_CA_CERTIFICATE="ca.crt"
-#      INFLUXDB_HTTP_HTTPS_CERTIFICATE="influxdb.crt"
-#      INFLUXDB_HTTP_HTTPS_PRIVATE_KEY="influxdb.key"
 
   chronograf:
     image: chronograf
@@ -51,60 +82,18 @@ services:
       placement:
         constraints:
           - node.role == manager
-      update_config:
-        parallelism: 1
-        delay: 1s
       restart_policy:
         condition: on-failure
-        delay: 10s
-        max_attempts: 3
-        window: 120s
-
-  grafana:
-    image: grafana/grafana
-    ports:
-      - "3000:3000"
-    networks:
-      - prod
-    volumes:
-      - type: volume
-        source: grafana
-        target: /var/lib/grafana
-    deploy:
-      replicas: 2
-      update_config:
-        parallelism: 1
-        delay: 1s
-      restart_policy:
-        condition: on-failure
-        delay: 10s
-        max_attempts: 3
-        window: 120s
-#   environment:
-#     GF_SectionName_KeyName: 
-#     GF_SERVER_ROOT_URL: "http://servername"
-#     GF_DEFAULT_INSTANCE_NAME: 
-#     GF_SECURITY_ADMIN_USER:: 'admin'
-#     GF_SECURITY_ADMIN_PASSWORD: 'admin'
-#     GF_USERS_AUTO_ASSIGN_ORG: 'true' (to the id=1 org)
-#     GF_USERS_AUTO_ASSIGN_ORG_ROLE: 'Viewer'
-#     GF_AUTH_ANONYMOUSE_ENABLED: 'true'
-#     GF_AUTH_ANONYMOUSE_ORG_NAME: ''
-#     GF_AUTH_ANONYMOUSE_ORG_ROLE: 'Viewer'
-#     GF_INSTALL_PLUGINS: 'plug1,plug2'
-#     GF_AUTH_BASIC_ENABLED: 'true'
-#     GF_AUTH_LDAP_ENABLED: 'true'
-#     GF_AUTH_LDAP_CONFIG_FILE: '/etc/grafana/ldap.toml'
-#     GF_SMTP_ENABLED: 'true'
-       
+ 
 networks:
   prod:
 
 volumes:
   influxdb:
   chronograf:
-  grafana:
 
 configs:
-  local.conf:
-    file: ./local.conf
+  #alyvix.conf:
+  #  file: ./alyvix.conf
+  telegraf.conf:
+    file: ./telegraf.conf
