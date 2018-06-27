@@ -84,16 +84,60 @@ services:
           - node.role == manager
       restart_policy:
         condition: on-failure
- 
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - prod
+    volumes:
+      - type: volume
+        source: grafana
+        target: /var/lib/grafana
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+    environment:
+#     GF_SectionName_KeyName: 
+#     GF_SERVER_ROOT_URL: "http://servername"
+#     GF_DEFAULT_INSTANCE_NAME: 
+#     GF_SECURITY_ADMIN_USER:: 'admin'
+#     GF_SECURITY_ADMIN_PASSWORD: 'admin'
+#     GF_USERS_AUTO_ASSIGN_ORG: 'true' (to the id=1 org)
+#     GF_USERS_AUTO_ASSIGN_ORG_ROLE: 'Viewer'
+#     GF_AUTH_ANONYMOUSE_ENABLED: 'true'
+#     GF_AUTH_ANONYMOUSE_ORG_NAME: 'Xilinx'
+#     GF_AUTH_ANONYMOUSE_ORG_ROLE: 'Viewer'
+#     GF_INSTALL_PLUGINS: 'plug1,plug2'
+#     GF_AUTH_BASIC_ENABLED: 'true'
+      GF_AUTH_LDAP_ENABLED: 'true'
+      GF_AUTH_LDAP_CONFIG_FILE: '/etc/grafana/ldap.toml'
+      GF_AUTH_LDAP_ALLOW_SIGN_UP: 'true'
+      GF_SMTP_ENABLED: 'true'
+      GF_SMTP_HOST: 'smtp.xilinx.com:25'
+      GF_SMTP_FROM_ADDRESS: 'dashboard@xilinx.com'
+      GF_SMTP_FROM_NAME: 'dashboard'
+    configs:
+      - source: ldap.toml
+        target: /etc/grafana/ldap.toml
+       
 networks:
   prod:
 
 volumes:
   influxdb:
   chronograf:
+  grafana:
 
 configs:
   #alyvix.conf:
   #  file: ./alyvix.conf
   telegraf.conf:
     file: ./telegraf.conf
+  ldap.toml:
+    file: ./ldap.toml
