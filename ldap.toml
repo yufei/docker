@@ -83,3 +83,4 @@ email =  "mail"
 # If you want to match all (or no ldap groups) then you can use wildcard
 group_dn = "*"
 org_role = "Viewer"
+org_id = 2
